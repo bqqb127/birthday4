@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>生日星轨祝福</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:linear-gradient(180deg,#fff0f6,#ffe3f0);min-height:100vh;display:flex;justify-content:center;align-items:center;overflow:hidden}
+.stage{position:relative;width:100vw;height:100vw;max-width:700px;max-height:700px;display:flex;justify-content:center;align-items:center;perspective:1200px}
+.orbit-ring{position:absolute;border-radius:50%;border:1px solid #ff8fb8;opacity:.25}
+.orbit-ring:nth-child(1){width:280px;height:280px}
+.orbit-ring:nth-child(2){width:340px;height:340px}
+.orbit-ring:nth-child(3){width:400px;height:400px}
+.orbit-ring:nth-child(4){width:460px;height:460px}
+.orbit-ring:nth-child(5){width:520px;height:520px}
+.orbit-ring:nth-child(6){width:580px;height:580px}
+.orbit-ring:nth-child(7){width:640px;height:640px}
+.orbit-ring:nth-child(8){width:700px;height:700px;opacity:.15}
+.center-role{width:220px;height:220px;border-radius:50%;overflow:hidden;border:4px solid #ff78a5;box-shadow:0 0 35px #ff78a5;z-index:999;position:relative}
+.center-role::after{content:"🎂 HAPPY BIRTHDAY";position:absolute;bottom:10px;left:50%;transform:translateX(-50%);background:#ff78a5;color:#fff;font-size:13px;padding:4px 10px;border-radius:20px;white-space:nowrap}
+.center-role img{width:100%;height:100%;object-fit:cover}
+.orbit-role{position:absolute;width:110px;height:110px;border-radius:14px;overflow:hidden;border:2px solid #ffdae6;background:#fff;z-index:888}
+.orbit-role img{width:100%;height:100%;object-fit:cover}
+.star-decor{position:absolute;font-size:20px;animation:float 5s infinite alternate;pointer-events:none}
+@keyframes float{0%{transform:translateY(0)}100%{transform:translateY(-10px)}}
+.popup{position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(255,245,250,.97);display:none;justify-content:center;align-items:center;z-index:9999}
+.popup.show{display:flex}
+.popup video{max-width:90vw;max-height:80vh;border-radius:18px}
+.close{position:absolute;top:30px;right:30px;font-size:40px;color:#ff78a5;cursor:pointer}
+</style>
+</head>
+<body>
+
+<!-- 修复：闭合音频标签，修正语法 -->
+<audio id="bgm" loop src="https://mir-s1-cdn-ig.karakalemcdn.com/mp3/preview/625811/625811841.mp3">
+
+<div class="stage">
+  <div class="orbit-ring"></div>
+  <div class="orbit-ring"></div>
+  <div class="orbit-ring"></div>
+  <div class="orbit-ring"></div>
+  <div class="orbit-ring"></div>
+  <div class="orbit-ring"></div>
+  <div class="orbit-ring"></div>
+  <div class="orbit-ring"></div>
+
+  <div class="center-role"><img src="https://picsum.photos/id/65/300/300"></div>
+  <div class="orbit-role"><img src="https://picsum.photos/id/1025/200/200"></div>
+  <div class="orbit-role"><img src="https://picsum.photos/id/1074/200/200"></div>
+  <div class="orbit-role"><img src="https://picsum.photos/id/1062/200/200"></div>
+  <div class="orbit-role"><img src="https://picsum.photos/id/1069/200/200"></div>
+</div>
+
+<div class="popup">
+  <div class="close">×</div>
+  <video id="player" playsinline></video>
+</div>
+
+<script>
+const bgm = document.getElementById("bgm");
+bgm.volume = 0.67; // 音量减小1/3
+
+// 自动播放兼容：页面加载+用户点击双保险
+document.addEventListener("touchstart", () => { bgm.play() }, { once: true });
+window.addEventListener("load", () => { bgm.play().catch(() => {}) });
+
+// 星环装饰生成
+const stage = document.querySelector(".stage");
+const icons = ["🎂","🎈","✨","🎁","🎊","💖"];
+const orbits = [280,340,400,460,520,580,640,700];
+for(let i=0;i<40;i++){
+  let d = document.createElement("div");
+  d.className = "star-decor";
+  d.innerText = icons[Math.floor(Math.random()*icons.length)];
+  let r = orbits[Math.floor(Math.random()*orbits.length)]/2;
+  let a = Math.random()*Math.PI*2;
+  d.style.left = 350 + r*Math.cos(a) + "px";
+  d.style.top = 350 + r*Math.sin(a) + "px";
+  stage.appendChild(d);
+}
+
+// 匀速慢速旋转动画
+const cards = document.querySelectorAll(".orbit-role");
+let angle = 0;
+function animate(){
+  angle += 0.006;
+  cards.forEach((el,i)=>{
+    let t = angle + i*Math.PI/2;
+    let l = 350 + 270*Math.cos(t) - 55;
+    let o = 350 + 270*Math.sin(t) - 55;
+    el.style.left = l + "px";
+    el.style.top = o + "px";
+  });
+  requestAnimationFrame(animate);
+}
+animate();
+
+// 点击交互：视频播放暂停音乐，关闭恢复
+const close = document.querySelector(".close");
+const popup = document.querySelector(".popup");
+close.onclick = () => {
+  popup.classList.remove("show");
+  bgm.play();
+};
+const items = document.querySelectorAll(".center-role,.orbit-role");
+items.forEach(e => {
+  e.onclick = () => {
+    bgm.pause();
+    popup.classList.add("show");
+  };
+});
+</script>
+
+</body>
+</html>
